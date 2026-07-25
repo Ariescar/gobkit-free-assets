@@ -1,0 +1,11 @@
+# never publish source art or internal docs
+*.fbx
+*.psd
+*.ma
+*.mb
+*.blend
+*.max
+_ADD-FREEBIE-PLAYBOOK.md
+CLAUDE.md
+*-DEVLOG.md
+deploy-*.bat

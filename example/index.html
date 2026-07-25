@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gobkit Free Assets — live demo (fetches the manifest, plays an animal)</title>
+<style>
+  html,body{margin:0;height:100%;background:#1a1c22;color:#e8eaf0;font-family:system-ui,sans-serif;overflow:hidden}
+  #ui{position:fixed;top:12px;left:12px;z-index:10;font-size:14px;line-height:1.5}
+  #ui a{color:#ff7a59}
+  button{background:#2a2e38;color:#e8eaf0;border:1px solid #444;border-radius:6px;padding:6px 10px;margin:2px;cursor:pointer}
+  button:hover{background:#3a3f4c}
+  #name{font-weight:700;margin-right:8px}
+</style>
+</head>
+<body>
+<div id="ui">
+  <div><b>Gobkit</b> free CC0 assets — <a href="https://gobkit.com/freebies?ref=github" target="_blank">gobkit.com/freebies</a></div>
+  <div style="margin-top:6px"><span id="name">loading…</span></div>
+  <div id="clips"></div>
+  <div id="pick" style="margin-top:6px"></div>
+</div>
+
+<!-- three r128 core (cdnjs) + GLTFLoader (jsdelivr — cdnjs has no examples/) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+const MANIFEST = "https://gobkit.com/api/free";
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1c22);
+const camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.1, 100);
+camera.position.set(2.2, 1.4, 2.6);
+camera.lookAt(0, 0.6, 0);
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;          // r128: else materials look dark
+document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x404050, 1.1));
+const dir = new THREE.DirectionalLight(0xffffff, 1.0); dir.position.set(3,5,2); scene.add(dir);
+addEventListener("resize", () => {
+  camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const loader = new THREE.GLTFLoader();
+const clock = new THREE.Clock();
+let mixer = null, clips = [], seg = null, local = 0, pivot = null, FPS = 24;
+
+function setSegment(c){ seg = c; local = 0; }
+
+function loadModel(url, packClips, displayName){
+  if (pivot){ scene.remove(pivot); pivot = null; }
+  mixer = null; clips = packClips || [];
+  document.getElementById("name").textContent = displayName;
+  loader.load(url, (gltf) => {
+    const model = gltf.scene;
+    // normalize: uniform-scale to ~1.4 tall, center on XZ, feet at y=0
+    const box = new THREE.Box3().setFromObject(model);
+    const size = new THREE.Vector3(); box.getSize(size);
+    const s = 1.4 / Math.max(size.x, size.y, size.z);
+    model.scale.setScalar(s);
+    const box2 = new THREE.Box3().setFromObject(model);
+    const c = new THREE.Vector3(); box2.getCenter(c);
+    model.position.x -= c.x; model.position.z -= c.z; model.position.y -= box2.min.y;
+    pivot = new THREE.Group();                 // rotate the pivot, not the mesh (facing +Z)
+    pivot.add(model);
+    scene.add(pivot);
+    if (gltf.animations && gltf.animations.length){
+      mixer = new THREE.AnimationMixer(model);
+      mixer.clipAction(gltf.animations[0]).play();   // play whole clip; we scrub it
+      buildClipButtons();
+      if (clips.length) setSegment(clips[0]);
+    }
+  });
+}
+
+function buildClipButtons(){
+  const wrap = document.getElementById("clips"); wrap.innerHTML = "";
+  clips.forEach((c) => {
+    const b = document.createElement("button");
+    b.textContent = c.name + (c.loop === false ? " (once)" : "");
+    b.onclick = () => setSegment(c);
+    wrap.appendChild(b);
+  });
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  if (mixer && seg){
+    local += dt;
+    const start = seg.from / FPS, dur = Math.max((seg.to - seg.from) / FPS, 1e-3);
+    // idle/attack/walk loop; dead (loop === false) plays once and holds the last frame
+    const loop = seg.loop !== false && seg.name !== "dead";
+    const t = loop ? start + (local % dur) : start + Math.min(local, dur);
+    mixer.setTime(t);
+  }
+  if (pivot) pivot.rotation.y += dt * 0.4;   // gentle spin just for the demo
+  renderer.render(scene, camera);
+}
+animate();
+
+// fetch the live manifest, list the animal pack, load the first one
+fetch(MANIFEST).then(r => r.json()).then(data => {
+  const packs = data.packs || [];
+  const pick = document.getElementById("pick");
+  packs.filter(p => p.rigged).forEach(pack => {
+    FPS = pack.fps || 24;
+    pack.models.forEach(m => {
+      const b = document.createElement("button");
+      b.textContent = m.name;
+      b.onclick = () => loadModel(m.url, pack.clips || pack.models[0].animations, m.name);
+      pick.appendChild(b);
+    });
+  });
+  const animal = packs.find(p => p.id === "gobkit-animal-pack") || packs.find(p => p.rigged);
+  if (animal){ FPS = animal.fps || 24; loadModel(animal.models[0].url, animal.clips, animal.models[0].name); }
+}).catch(e => {
+  document.getElementById("name").textContent = "Could not fetch manifest (open via a local server / check network).";
+  console.error(e);
+});
+</script>
+</body>
+</html>
