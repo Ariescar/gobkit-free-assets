@@ -24,7 +24,7 @@ To list matches from a terminal: `node scripts/find.mjs <words...>` (for example
 or `node scripts/find.mjs dinosaur walk`) prints each matching model with its URL and clip names.
 
 Agents that speak MCP can use the same data as tools instead (search_models, get_model, list_packs; read-only,
-no key): add the remote server `https://gobkit-freebies.pages.dev/mcp` (Streamable HTTP), listed in the MCP Registry
+no key): add the remote server `https://gobkit.com/mcp` (Streamable HTTP), listed in the MCP Registry
 as `io.github.Ariescar/gobkit-free-3d`.
 
 ## 2. Pick and fetch

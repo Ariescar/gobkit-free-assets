@@ -31,7 +31,7 @@ See [`skills/gobkit-free-3d-assets/SKILL.md`](skills/gobkit-free-3d-assets/SKILL
 The same free models as read-only tools for MCP clients (Claude, Cursor, VS Code and others) — no key, no login:
 
 ```
-https://gobkit-freebies.pages.dev/mcp      (Streamable HTTP · MCP Registry: io.github.Ariescar/gobkit-free-3d)
+https://gobkit.com/mcp      (Streamable HTTP · MCP Registry: io.github.Ariescar/gobkit-free-3d)
 ```
 
 Tools: `search_models` (words, kind, animated), `get_model` (one model's .glb URL, clip names and a three.js snippet),
