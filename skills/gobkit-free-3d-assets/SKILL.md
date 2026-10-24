@@ -23,6 +23,10 @@ GET https://gobkit.com/api/free      # no auth, no key, CORS: *
 To list matches from a terminal: `node scripts/find.mjs <words...>` (for example `node scripts/find.mjs shark`
 or `node scripts/find.mjs dinosaur walk`) prints each matching model with its URL and clip names.
 
+Agents that speak MCP can use the same data as tools instead (search_models, get_model, list_packs; read-only,
+no key): add the remote server `https://gobkit-freebies.pages.dev/mcp` (Streamable HTTP), listed in the MCP Registry
+as `io.github.Ariescar/gobkit-free-3d`.
+
 ## 2. Pick and fetch
 
 - Match the user's request against model `name`, pack `name` and `kind` (`characters` or `environment`).

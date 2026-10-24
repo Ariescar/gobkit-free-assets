@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Ariescar/gobkit-free-3d",
+  "title": "Gobkit Free 3D Models",
+  "description": "Free CC0 low-poly 3D models (GLB): rigged, animated animals, dinos, insects, people. No key.",
+  "version": "1.0.0",
+  "websiteUrl": "https://gobkit.com/freebies",
+  "remotes": [
+    { "type": "streamable-http", "url": "https://gobkit-freebies.pages.dev/mcp" }
+  ]
+}
