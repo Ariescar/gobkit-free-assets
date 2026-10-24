@@ -10,6 +10,22 @@ Drop them into Three.js, Unity, Unreal, or Godot. No retopo, no rig cleanup, no 
 > *"Fetch https://gobkit.com/api/free and build a Three.js scene from the free Gobkit models."*
 > The manifest is open (CORS-enabled), lists every pack, and describes how to use them.
 
+## Use it from your AI coding agent (skill)
+
+This repo ships an agent skill that finds, downloads and animates the free models for you
+(Claude Code, Cursor, Codex and other agents that read `SKILL.md` skills):
+
+```
+npx skills add https://github.com/Ariescar/gobkit-free-assets --skill gobkit-free-3d-assets
+```
+
+Then ask: *"Add five low-poly enemies from Gobkit and make them walk."* The skill reads the live manifest
+(every free pack, not only the files in this repo), loads each `.glb` by its URL and plays the clips by name.
+See [`skills/gobkit-free-3d-assets/SKILL.md`](skills/gobkit-free-3d-assets/SKILL.md).
+
+> The `.glb` files stored in this repo are the first releases, with one baked track (frame ranges below).
+> The live manifest's packs ship separate named clips — play those by name.
+
 ---
 
 ## What's inside
